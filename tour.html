@@ -3,80 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Salisbury OneMap</title>
+<title>Salisbury OneMap Tour</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy:   #004676;
-    --blue:   #005e9c;
-    --light:  #e8f1f8;
-    --white:  #ffffff;
-    --beacon: #f0a500;
+    --navy:        #004676;
+    --blue:        #005e9c;
+    --light:       #e8f1f8;
+    --beacon:      #f0a500;
     --beacon-ring: rgba(240,165,0,0.22);
-    --shadow: 0 4px 24px rgba(0,70,118,0.18);
+    --shadow:      0 4px 24px rgba(0,70,118,0.22);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: 'Montserrat', sans-serif;
-    background: var(--navy);
+    background: #000;
     height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
 
-  /* ── Tour launch bar ── */
-  .tour-bar {
-    background: var(--navy);
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-
-  .tour-bar .brand {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 0.04em;
-  }
-
-  .tour-launch {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--beacon);
-    color: #000;
-    border: none;
-    border-radius: 20px;
-    padding: 6px 16px;
-    font-family: 'Montserrat', sans-serif;
-    font-size: 0.72rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.02em;
-  }
-  .tour-launch:hover { background: #e09500; transform: translateY(-1px); box-shadow: 0 3px 12px rgba(240,165,0,0.4); }
-  .tour-launch.active { background: #ccc; color: #555; }
-
-  .pulse-icon {
-    width: 8px; height: 8px;
-    background: #000;
-    border-radius: 50%;
-    animation: miniPulse 1.5s ease-in-out infinite;
-  }
-  @keyframes miniPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.7); }
-  }
-
-  /* ── iFrame wrapper ── */
+  /* ── Full screen iFrame ── */
   .map-wrapper {
     flex: 1;
     position: relative;
@@ -90,14 +40,13 @@
     display: block;
   }
 
-  /* ── Tour overlay ── */
+  /* ── Overlay — NO blur, very light tint ── */
   .tour-overlay {
     display: none;
     position: absolute;
     inset: 0;
-    background: rgba(0,20,40,0.5);
+    background: rgba(0,20,40,0.25);
     z-index: 80;
-    backdrop-filter: blur(1.5px);
   }
   .tour-overlay.active { display: block; }
 
@@ -108,31 +57,32 @@
     z-index: 100;
     cursor: pointer;
     transform: translate(-50%, -50%);
-    width: 28px; height: 28px;
+    width: 36px; height: 36px;
   }
   .beacon.visible { display: block; }
 
   .beacon-core {
     position: relative;
-    width: 28px; height: 28px;
+    width: 36px; height: 36px;
     display: flex; align-items: center; justify-content: center;
   }
 
   .beacon-dot {
-    width: 28px; height: 28px;
+    width: 36px; height: 36px;
     background: var(--beacon);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700;
-    font-size: 0.7rem;
-    color: #000;
+    font-weight: 800;
+    font-size: 0.85rem;
+    color: #fff;
     position: relative;
     z-index: 2;
-    box-shadow: 0 2px 10px rgba(240,165,0,0.6);
+    box-shadow: 0 2px 12px rgba(240,165,0,0.7);
     transition: transform 0.15s;
-    border: 2px solid rgba(255,255,255,0.6);
+    border: 2.5px solid rgba(255,255,255,0.8);
+    font-family: 'Montserrat', sans-serif;
   }
-  .beacon:hover .beacon-dot { transform: scale(1.2); }
+  .beacon:hover .beacon-dot { transform: scale(1.18); }
 
   .ring {
     position: absolute;
@@ -146,8 +96,8 @@
   .ring:nth-child(3) { animation-delay: 1.3s; }
 
   @keyframes ringOut {
-    0%   { width: 28px; height: 28px; opacity: 0.9; }
-    100% { width: 72px; height: 72px; opacity: 0; }
+    0%   { width: 36px; height: 36px; opacity: 0.9; }
+    100% { width: 80px; height: 80px; opacity: 0; }
   }
 
   /* ── Tooltip ── */
@@ -155,12 +105,13 @@
     display: none;
     position: absolute;
     z-index: 110;
-    width: 280px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: var(--shadow), 0 0 0 1px rgba(0,70,118,0.08);
+    width: 290px;
+    background: var(--navy);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
     overflow: hidden;
     animation: tipIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    border: 1px solid rgba(255,255,255,0.12);
   }
   .tour-tip.visible { display: block; }
 
@@ -170,92 +121,95 @@
   }
 
   .tip-header {
-    background: var(--navy);
-    padding: 11px 14px;
+    background: var(--blue);
+    padding: 12px 16px;
     display: flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
   }
 
-  .tip-icon { font-size: 1.1rem; }
+  .tip-icon { font-size: 1.2rem; }
 
   .tip-title {
     font-family: 'Montserrat', sans-serif;
-    color: white;
-    font-size: 0.9rem;
-    font-weight: 600;
+    color: #fff;
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
   }
 
   .tip-counter {
     margin-left: auto;
     font-size: 0.6rem;
-    color: rgba(255,255,255,0.55);
-    font-family: monospace;
+    color: rgba(255,255,255,0.6);
+    font-family: 'Montserrat', sans-serif;
     letter-spacing: 0.08em;
+    font-weight: 500;
   }
 
   .tip-body {
-    padding: 12px 14px 4px;
+    padding: 14px 16px 6px;
     font-size: 0.78rem;
-    line-height: 1.55;
-    color: #333;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.9);
+    font-weight: 400;
   }
 
   .tip-callout {
-    margin: 10px 0 4px;
-    padding: 8px 11px;
-    background: var(--light);
-    border-left: 3px solid var(--blue);
-    border-radius: 0 4px 4px 0;
-    font-size: 0.7rem;
-    color: var(--navy);
-    line-height: 1.45;
+    margin: 10px 0 6px;
+    padding: 9px 12px;
+    background: rgba(255,255,255,0.1);
+    border-left: 3px solid var(--beacon);
+    border-radius: 0 5px 5px 0;
+    font-size: 0.71rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.5;
+    font-weight: 500;
   }
 
   .tip-footer {
-    padding: 10px 14px;
+    padding: 10px 16px 14px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #eee;
-    margin-top: 8px;
   }
 
   .tip-exit {
     font-size: 0.62rem;
-    color: #aaa;
+    color: rgba(255,255,255,0.4);
     background: none;
     border: none;
     cursor: pointer;
     font-family: 'Montserrat', sans-serif;
     text-decoration: underline;
+    font-weight: 500;
   }
-  .tip-exit:hover { color: #666; }
+  .tip-exit:hover { color: rgba(255,255,255,0.7); }
 
   .tip-next {
-    background: var(--blue);
-    color: white;
+    background: var(--beacon);
+    color: #fff;
     border: none;
-    border-radius: 4px;
-    padding: 6px 16px;
-    font-size: 0.7rem;
-    font-weight: 600;
+    border-radius: 5px;
+    padding: 7px 18px;
+    font-size: 0.72rem;
+    font-weight: 700;
     cursor: pointer;
     font-family: 'Montserrat', sans-serif;
     transition: background 0.15s;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
   }
-  .tip-next:hover { background: var(--navy); }
+  .tip-next:hover { background: #d99200; }
 
   /* ── Highlight ring ── */
   .hl-ring {
     display: none;
     position: absolute;
-    border: 2px solid var(--beacon);
+    border: 2.5px solid var(--beacon);
     border-radius: 6px;
     pointer-events: none;
     z-index: 90;
-    box-shadow: 0 0 0 4px var(--beacon-ring), inset 0 0 0 2px rgba(240,165,0,0.1);
+    box-shadow: 0 0 0 4px var(--beacon-ring);
     transition: all 0.3s cubic-bezier(0.34,1.2,0.64,1);
   }
   .hl-ring.visible { display: block; }
@@ -264,83 +218,123 @@
   .intro-card {
     display: none;
     position: absolute;
-    bottom: 32px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     z-index: 120;
     background: var(--navy);
-    color: white;
-    border-radius: 10px;
-    padding: 18px 22px;
-    max-width: 340px;
+    color: #fff;
+    border-radius: 12px;
+    padding: 28px 26px;
+    max-width: 360px;
     width: 90%;
     box-shadow: var(--shadow);
     text-align: center;
     animation: tipIn 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.12);
   }
   .intro-card.visible { display: block; }
 
+  .intro-card .logo {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
   .intro-card h2 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.05rem;
-    margin-bottom: 6px;
-    color: white;
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: #fff;
+    letter-spacing: -0.01em;
   }
 
   .intro-card p {
     font-size: 0.75rem;
-    color: rgba(255,255,255,0.7);
-    line-height: 1.5;
-    margin-bottom: 14px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.6;
+    margin-bottom: 18px;
+    font-weight: 400;
   }
 
-  .intro-card .beacon-sample {
+  .beacon-hint {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     font-size: 0.72rem;
     color: var(--beacon);
     font-weight: 600;
-    margin-bottom: 14px;
+    margin-bottom: 18px;
+    background: rgba(240,165,0,0.1);
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(240,165,0,0.3);
   }
 
   .intro-start {
     background: var(--beacon);
-    color: #000;
+    color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 8px 24px;
+    border-radius: 7px;
+    padding: 11px 28px;
     font-weight: 700;
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     cursor: pointer;
     font-family: 'Montserrat', sans-serif;
     transition: all 0.15s;
     width: 100%;
+    letter-spacing: 0.02em;
   }
-  .intro-start:hover { background: #e09500; }
+  .intro-start:hover { background: #d99200; transform: translateY(-1px); }
 
-  /* Mobile adjustments */
+  /* ── Exit bar at bottom ── */
+  .exit-bar {
+    display: none;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 100;
+    background: var(--navy);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .exit-bar span {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+  }
+
+  .exit-bar a {
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 5px;
+    padding: 6px 16px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    text-decoration: none;
+    transition: all 0.15s;
+    letter-spacing: 0.03em;
+  }
+  .exit-bar a:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+  }
+
   @media (max-width: 480px) {
-    .tour-tip { width: 240px; }
-    .tour-bar .brand { display: none; }
+    .tour-tip { width: 250px; }
   }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
-<div class="tour-bar">
-  <span class="brand">City of Salisbury, Maryland</span>
-  <button class="tour-launch" id="tourBtn" onclick="startTour()">
-    <span class="pulse-icon"></span>
-    How to use OneMap
-  </button>
-</div>
-
-<!-- MAP WRAPPER -->
 <div class="map-wrapper" id="mapWrapper">
 
-  <!-- iFrame -->
   <iframe
     id="mapFrame"
     src="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/"
@@ -348,189 +342,143 @@
     allowfullscreen>
   </iframe>
 
-  <!-- Overlay -->
-  <div class="tour-overlay" id="tourOverlay" onclick="handleOverlayClick(event)"></div>
+  <!-- Light overlay -->
+  <div class="tour-overlay" id="tourOverlay"></div>
 
   <!-- Highlight ring -->
   <div class="hl-ring" id="hlRing"></div>
 
-  <!-- Beacons -->
-  <div class="beacon" id="b0" onclick="openTip(0)">
-    <div class="beacon-core">
-      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-      <div class="beacon-dot">1</div>
-    </div>
-  </div>
-  <div class="beacon" id="b1" onclick="openTip(1)">
-    <div class="beacon-core">
-      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-      <div class="beacon-dot">2</div>
-    </div>
-  </div>
-  <div class="beacon" id="b2" onclick="openTip(2)">
-    <div class="beacon-core">
-      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-      <div class="beacon-dot">3</div>
-    </div>
-  </div>
-  <div class="beacon" id="b3" onclick="openTip(3)">
-    <div class="beacon-core">
-      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-      <div class="beacon-dot">4</div>
-    </div>
-  </div>
-  <div class="beacon" id="b4" onclick="openTip(4)">
-    <div class="beacon-core">
-      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-      <div class="beacon-dot">5</div>
-    </div>
-  </div>
-  <div class="beacon" id="b5" onclick="openTip(5)">
-    <div class="beacon-core">
-      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-      <div class="beacon-dot">6</div>
-    </div>
-  </div>
-  <div class="beacon" id="b6" onclick="openTip(6)">
-    <div class="beacon-core">
-      <div class="ring"></div><div class="ring"></div><div class="ring"></div>
-      <div class="beacon-dot">7</div>
-    </div>
-  </div>
+  <!-- 7 Beacons -->
+  <div class="beacon" id="b0" onclick="openTip(0)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">1</div></div></div>
+  <div class="beacon" id="b1" onclick="openTip(1)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">2</div></div></div>
+  <div class="beacon" id="b2" onclick="openTip(2)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">3</div></div></div>
+  <div class="beacon" id="b3" onclick="openTip(3)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">4</div></div></div>
+  <div class="beacon" id="b4" onclick="openTip(4)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">5</div></div></div>
+  <div class="beacon" id="b5" onclick="openTip(5)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">6</div></div></div>
+  <div class="beacon" id="b6" onclick="openTip(6)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">7</div></div></div>
 
   <!-- Tooltip -->
   <div class="tour-tip" id="tourTip">
     <div class="tip-header">
       <span class="tip-icon" id="tipIcon">🔍</span>
       <span class="tip-title" id="tipTitle">Search</span>
-      <span class="tip-counter" id="tipCounter">1 / 6</span>
+      <span class="tip-counter" id="tipCounter">1 / 7</span>
     </div>
     <div class="tip-body">
       <div id="tipBody"></div>
       <div class="tip-callout" id="tipCallout"></div>
     </div>
     <div class="tip-footer">
-      <button class="tip-exit" onclick="closeTour()">Exit tour</button>
+      <button class="tip-exit" onclick="closeTip()">Close</button>
       <button class="tip-next" id="tipNext" onclick="nextTip()">Next →</button>
     </div>
   </div>
 
   <!-- Intro card -->
   <div class="intro-card" id="introCard">
+    <div class="logo">🗺️</div>
     <h2>Welcome to Salisbury OneMap</h2>
-    <p>This interactive map brings together City data in one place — from zoning and floodplains to trash pickup days and polling locations.</p>
-    <div class="beacon-sample">
-      <span style="background:var(--beacon);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#000">✦</span>
-      Tap the glowing numbers to explore key features
+    <p>This interactive map brings together City of Salisbury data in one place — from zoning and floodplains to trash pickup days and polling locations.</p>
+    <div class="beacon-hint">
+      <span style="background:var(--beacon);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#fff">1</span>
+      Tap the glowing numbers to explore
     </div>
-    <button class="intro-start" onclick="showBeacons()">Start the tour</button>
+    <button class="intro-start" onclick="showBeacons()">Start the tour →</button>
+  </div>
+
+  <!-- Exit bar -->
+  <div class="exit-bar" id="exitBar">
+    <span>Salisbury OneMap Tour</span>
+    <a href="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/" target="_top">← Exit tour &amp; return to OneMap</a>
   </div>
 
 </div>
 
 <script>
-const W = window;
 let tourActive = false;
 let currentTip = -1;
 
-// ── Tour stop definitions ──
-// Positions are percentages of the map wrapper (responsive)
-// [xPct, yPct] where 0,0 = top-left, 100,100 = bottom-right
-// Desktop vs mobile positions handled via isMobile()
-
+// ── Tour stops ──
+// Positions tuned from screenshot: [xPct, yPct]
+// Desktop positions based on actual screenshot observation
 const stops = [
   {
     icon: '🔍',
     title: 'Address Search',
     body: 'Type any Salisbury address to instantly generate a full property report — your City Council district and representative, trash pickup day, zoning, floodplain status, police sector, fire station, polling location, and more.',
     callout: '💡 This is the fastest way to answer "what city services apply to my address?" — all in one place.',
-    // Desktop: top-center area, Mobile: near top search bar
-    pos: { desk: [48, 7], mob: [75, 8] }
+    pos: { desk: [76, 7], mob: [75, 8] }
   },
   {
     icon: '🗂',
     title: 'Layer Categories',
     body: 'These buttons filter the layer list by topic — Infrastructure, Planning, Environment, Safety, and Community. They help you find relevant layers faster without scrolling through the full list.',
-    callout: '💡 Selecting a category filters the list but doesn\'t turn layers on automatically — check the box next to any layer to display it on the map.',
-    pos: { desk: [18, 12], mob: [50, 92] }
+    callout: '💡 Selecting a category filters the list but does not turn layers on automatically — check the box next to any layer to display it on the map.',
+    pos: { desk: [14, 12], mob: [50, 92] }
   },
   {
     icon: '📋',
     title: 'Layer List',
     body: 'Check any layer\'s box to show it on the map. Some layers only appear at closer zoom levels — if a layer isn\'t showing after you check it, try zooming in.',
     callout: '💡 Click the ··· next to any layer for extra options: zoom to it, adjust transparency, set a filter, or export the data.',
-    pos: { desk: [12, 45], mob: [12, 55] }
+    pos: { desk: [12, 50], mob: [12, 55] }
   },
   {
     icon: '🔖',
-    title: 'Bookmarks & Menu',
-    body: 'The menu in the top-right corner contains curated Bookmarks — these go further than categories. A bookmark zooms you to a specific area AND automatically turns on the relevant layers for you.',
+    title: 'Menu & Bookmarks',
+    body: 'The menu in the top-right contains curated Bookmarks — these go further than categories. A bookmark zooms you to a specific area AND automatically turns on the relevant layers for you.',
     callout: '💡 If you\'re not sure where to start, bookmarks are the quickest way to jump into a topic without configuring anything manually.',
-    pos: { desk: [94, 4], mob: [88, 4] }
+    pos: { desk: [97, 4], mob: [88, 4] }
   },
   {
     icon: '🛠',
     title: 'Map Tools',
     body: 'The toolbar on the right gives you powerful tools: Draw to sketch on the map, Measure distances and areas, Elevation Profile along any path, and Coordinates to identify any location.',
-    callout: '💡 Use the Share tool to copy a URL that preserves exactly what you\'re looking at — the view, active layers, and location — so you can send it to someone else.',
-    pos: { desk: [93, 45], mob: null } // hidden on mobile
+    callout: '💡 Use the Share tool to copy a URL that preserves exactly what you\'re looking at — the view, active layers, and location.',
+    pos: { desk: [97, 50], mob: null }
   },
   {
     icon: '📊',
     title: 'Data Table',
-    body: 'See that small arrow at the bottom center of the map? Click it to open a data drawer showing a full table of records from your visible layers — great for browsing, sorting, and reviewing multiple features at once.',
-    callout: '💡 The table updates based on what layers are turned on and what\'s in your current map view — zoom in to narrow the results.',
-    pos: { desk: [50, 88], mob: [50, 80] }
+    body: 'See the small arrow at the bottom center of the map? Click it to open a data drawer showing a full table of records from your visible layers — great for browsing, sorting, and reviewing multiple features at once.',
+    callout: '💡 The table updates based on what layers are turned on and what\'s visible in your current map view.',
+    pos: { desk: [50, 90], mob: [50, 82] }
   },
   {
     icon: '🛰',
     title: 'Basemap Gallery',
-    body: 'Switch between different basemaps including standard Esri street and topographic maps, or high-resolution NearMap aerial imagery — one of the most powerful views available for property-level detail.',
-    callout: '💡 NearMap imagery is updated far more frequently than standard satellite views — great for seeing recent construction, lot changes, or ground-level detail.',
-    pos: { desk: [88, 8], mob: [88, 14] }
+    body: 'Switch between different basemaps including standard Esri street and topographic maps, or high-resolution NearMap aerial imagery — updated far more frequently than standard satellite views.',
+    callout: '💡 NearMap is great for seeing recent construction, lot changes, or fine property-level detail that older imagery misses.',
+    pos: { desk: [97, 28], mob: [88, 14] }
   },
 ];
 
-function isMobile() {
-  return W.innerWidth <= 600;
-}
-
-function getMapRect() {
-  return document.getElementById('mapWrapper').getBoundingClientRect();
-}
+function isMobile() { return window.innerWidth <= 600; }
+function getRect()  { return document.getElementById('mapWrapper').getBoundingClientRect(); }
 
 function positionBeacons() {
-  const rect = getMapRect();
+  const rect = getRect();
   const mobile = isMobile();
-
   stops.forEach((stop, i) => {
     const beacon = document.getElementById('b' + i);
     const pos = mobile ? stop.pos.mob : stop.pos.desk;
-
-    if (!pos) {
-      beacon.style.display = 'none';
-      return;
-    }
-
+    if (!pos) { beacon.style.display = 'none'; return; }
     beacon.style.display = '';
-    beacon.style.left = (pos[0] / 100 * rect.width) + 'px';
+    beacon.style.left = (pos[0] / 100 * rect.width)  + 'px';
     beacon.style.top  = (pos[1] / 100 * rect.height) + 'px';
   });
 }
 
-// ResizeObserver — repositions beacons whenever layout changes
-const ro = new ResizeObserver(() => {
-  if (tourActive) positionBeacons();
-});
+const ro = new ResizeObserver(() => { if (tourActive) positionBeacons(); });
 ro.observe(document.getElementById('mapWrapper'));
 
-function startTour() {
+// Auto-start tour on load
+window.addEventListener('load', () => {
   tourActive = true;
-  document.getElementById('tourBtn').classList.add('active');
-  document.getElementById('tourBtn').textContent = 'Tour active';
   document.getElementById('tourOverlay').classList.add('active');
   document.getElementById('introCard').classList.add('visible');
-}
+  document.getElementById('exitBar').style.display = 'flex';
+});
 
 function showBeacons() {
   document.getElementById('introCard').classList.remove('visible');
@@ -543,85 +491,64 @@ function openTip(index) {
   const stop = stops[index];
   const mobile = isMobile();
   const pos = mobile ? stop.pos.mob : stop.pos.desk;
-
   if (!pos) return;
 
-  // Populate
   document.getElementById('tipIcon').textContent    = stop.icon;
   document.getElementById('tipTitle').textContent   = stop.title;
-  document.getElementById('tipCounter').textContent = `${index + 1} / ${stops.filter(s => isMobile() ? s.pos.mob : s.pos.desk).length}`;
   document.getElementById('tipBody').textContent    = stop.body;
   document.getElementById('tipCallout').textContent = stop.callout;
-  document.getElementById('tipNext').textContent    = index < stops.length - 1 ? 'Next →' : 'Done ✓';
 
-  // Position tooltip
-  const rect = getMapRect();
+  // Count visible stops
+  const visibleCount = stops.filter(s => mobile ? s.pos.mob : s.pos.desk).length;
+  let visibleIndex = 0;
+  for (let i = 0; i <= index; i++) {
+    if (mobile ? stops[i].pos.mob : stops[i].pos.desk) visibleIndex++;
+  }
+  document.getElementById('tipCounter').textContent = `${visibleIndex} / ${visibleCount}`;
+  document.getElementById('tipNext').textContent = index < stops.length - 1 ? 'Next →' : 'Done ✓';
+
+  const rect = getRect();
   const bx = pos[0] / 100 * rect.width;
   const by = pos[1] / 100 * rect.height;
   const tip = document.getElementById('tourTip');
-  const tipW = mobile ? 240 : 280;
-  const tipH = 220;
+  const tipW = mobile ? 250 : 290;
+  const tipH = 230;
 
-  let tx = bx + 36, ty = by - 60;
-  if (tx + tipW > rect.width - 10)  tx = bx - tipW - 14;
+  let tx = bx + 42, ty = by - 70;
+  if (tx + tipW > rect.width - 10)  tx = bx - tipW - 16;
   if (tx < 10) tx = 10;
-  if (ty < 10) ty = by + 36;
-  if (ty + tipH > rect.height - 10) ty = rect.height - tipH - 10;
+  if (ty < 10) ty = by + 42;
+  if (ty + tipH > rect.height - 60) ty = rect.height - tipH - 60;
 
   tip.style.left  = tx + 'px';
   tip.style.top   = ty + 'px';
   tip.style.width = tipW + 'px';
   tip.classList.add('visible');
 
-  // Highlight ring around beacon
+  // Highlight
   const hl = document.getElementById('hlRing');
-  hl.style.left   = (bx - 20) + 'px';
-  hl.style.top    = (by - 20) + 'px';
-  hl.style.width  = '40px';
-  hl.style.height = '40px';
+  hl.style.left   = (bx - 22) + 'px';
+  hl.style.top    = (by - 22) + 'px';
+  hl.style.width  = '44px';
+  hl.style.height = '44px';
   hl.classList.add('visible');
+}
+
+function closeTip() {
+  document.getElementById('tourTip').classList.remove('visible');
+  document.getElementById('hlRing').classList.remove('visible');
 }
 
 function nextTip() {
   const mobile = isMobile();
   let next = currentTip + 1;
-
-  // Skip mobile-hidden stops
   while (next < stops.length && mobile && !stops[next].pos.mob) next++;
-
-  if (next < stops.length) {
-    openTip(next);
-  } else {
-    closeTour();
-  }
+  if (next < stops.length) { openTip(next); }
+  else { closeTip(); }
 }
 
-function handleOverlayClick(e) {
-  // Only close if clicking overlay directly, not a beacon or tooltip
-  if (e.target === document.getElementById('tourOverlay')) {
-    document.getElementById('tourTip').classList.remove('visible');
-    document.getElementById('hlRing').classList.remove('visible');
-  }
-}
-
-function closeTour() {
-  tourActive = false;
-  currentTip = -1;
-  document.getElementById('tourOverlay').classList.remove('active');
-  document.getElementById('tourTip').classList.remove('visible');
-  document.getElementById('hlRing').classList.remove('visible');
-  document.getElementById('introCard').classList.remove('visible');
-  document.querySelectorAll('.beacon').forEach(b => b.classList.remove('visible'));
-  const btn = document.getElementById('tourBtn');
-  btn.classList.remove('active');
-  btn.innerHTML = '<span class="pulse-icon"></span> How to use OneMap';
-}
-
-// Reposition on resize
-W.addEventListener('resize', () => { if (tourActive) positionBeacons(); });
-
-// Escape key closes tour
-W.addEventListener('keydown', e => { if (e.key === 'Escape') closeTour(); });
+window.addEventListener('resize', () => { if (tourActive) positionBeacons(); });
+window.addEventListener('keydown', e => { if (e.key === 'Escape') closeTip(); });
 </script>
 </body>
 </html>
