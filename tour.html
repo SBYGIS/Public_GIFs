@@ -7,12 +7,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy:        #004676;
-    --blue:        #005e9c;
-    --light:       #e8f1f8;
-    --beacon:      #f0a500;
-    --beacon-ring: rgba(240,165,0,0.22);
-    --shadow:      0 4px 24px rgba(0,70,118,0.22);
+    --navy:   #004676;
+    --blue:   #005e9c;
+    --light:  #e8f1f8;
+    --white:  #ffffff;
+    --border: #dde8f0;
+    --text:   #2a2a2a;
+    --muted:  #6b7a8a;
+    --shadow: 0 4px 28px rgba(0,70,118,0.18);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,7 +28,6 @@
     overflow: hidden;
   }
 
-  /* ── Full screen iFrame ── */
   .map-wrapper {
     flex: 1;
     position: relative;
@@ -40,12 +41,12 @@
     display: block;
   }
 
-  /* ── Overlay — NO blur, very light tint ── */
+  /* Light tint only — no blur */
   .tour-overlay {
     display: none;
     position: absolute;
     inset: 0;
-    background: rgba(0,20,40,0.25);
+    background: rgba(0,15,35,0.22);
     z-index: 80;
   }
   .tour-overlay.active { display: block; }
@@ -57,19 +58,19 @@
     z-index: 100;
     cursor: pointer;
     transform: translate(-50%, -50%);
-    width: 36px; height: 36px;
+    width: 38px; height: 38px;
   }
   .beacon.visible { display: block; }
 
   .beacon-core {
     position: relative;
-    width: 36px; height: 36px;
+    width: 38px; height: 38px;
     display: flex; align-items: center; justify-content: center;
   }
 
   .beacon-dot {
-    width: 36px; height: 36px;
-    background: var(--beacon);
+    width: 38px; height: 38px;
+    background: var(--navy);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 800;
@@ -77,18 +78,21 @@
     color: #fff;
     position: relative;
     z-index: 2;
-    box-shadow: 0 2px 12px rgba(240,165,0,0.7);
+    box-shadow: 0 2px 14px rgba(0,70,118,0.55);
     transition: transform 0.15s;
-    border: 2.5px solid rgba(255,255,255,0.8);
+    border: 2.5px solid rgba(255,255,255,0.85);
     font-family: 'Montserrat', sans-serif;
   }
-  .beacon:hover .beacon-dot { transform: scale(1.18); }
+  .beacon:hover .beacon-dot {
+    transform: scale(1.18);
+    background: var(--blue);
+  }
 
   .ring {
     position: absolute;
     top: 50%; left: 50%;
     border-radius: 50%;
-    background: var(--beacon-ring);
+    background: rgba(0,70,118,0.18);
     transform: translate(-50%, -50%);
     animation: ringOut 2s ease-out infinite;
   }
@@ -96,22 +100,22 @@
   .ring:nth-child(3) { animation-delay: 1.3s; }
 
   @keyframes ringOut {
-    0%   { width: 36px; height: 36px; opacity: 0.9; }
-    100% { width: 80px; height: 80px; opacity: 0; }
+    0%   { width: 38px; height: 38px; opacity: 0.9; }
+    100% { width: 82px; height: 82px; opacity: 0; }
   }
 
-  /* ── Tooltip ── */
+  /* ── Tooltip — matches address popup style ── */
   .tour-tip {
     display: none;
     position: absolute;
     z-index: 110;
     width: 290px;
-    background: var(--navy);
-    border-radius: 10px;
+    background: var(--white);
+    border-radius: 8px;
     box-shadow: var(--shadow);
     overflow: hidden;
     animation: tipIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
-    border: 1px solid rgba(255,255,255,0.12);
+    border: 1px solid var(--border);
   }
   .tour-tip.visible { display: block; }
 
@@ -120,63 +124,68 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
 
+  /* Header matches address popup navy header */
   .tip-header {
-    background: var(--blue);
+    background: var(--navy);
     padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 10px;
   }
 
-  .tip-icon { font-size: 1.2rem; }
+  .tip-icon { font-size: 1.1rem; }
 
   .tip-title {
     font-family: 'Montserrat', sans-serif;
     color: #fff;
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 700;
     letter-spacing: 0.01em;
   }
 
   .tip-counter {
     margin-left: auto;
-    font-size: 0.6rem;
+    font-size: 0.58rem;
     color: rgba(255,255,255,0.6);
     font-family: 'Montserrat', sans-serif;
     letter-spacing: 0.08em;
     font-weight: 500;
   }
 
+  /* Body matches popup card white bg */
   .tip-body {
-    padding: 14px 16px 6px;
-    font-size: 0.78rem;
+    padding: 13px 16px 6px;
+    font-size: 0.75rem;
     line-height: 1.6;
-    color: rgba(255,255,255,0.9);
+    color: var(--text);
     font-weight: 400;
   }
 
+  /* Callout matches popup section style */
   .tip-callout {
     margin: 10px 0 6px;
     padding: 9px 12px;
-    background: rgba(255,255,255,0.1);
-    border-left: 3px solid var(--beacon);
+    background: var(--light);
+    border-left: 3px solid var(--blue);
     border-radius: 0 5px 5px 0;
-    font-size: 0.71rem;
-    color: rgba(255,255,255,0.85);
+    font-size: 0.7rem;
+    color: var(--navy);
     line-height: 1.5;
     font-weight: 500;
   }
 
   .tip-footer {
-    padding: 10px 16px 14px;
+    padding: 10px 16px 13px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
   }
 
-  .tip-exit {
+  .tip-close {
     font-size: 0.62rem;
-    color: rgba(255,255,255,0.4);
+    color: var(--muted);
     background: none;
     border: none;
     cursor: pointer;
@@ -184,37 +193,37 @@
     text-decoration: underline;
     font-weight: 500;
   }
-  .tip-exit:hover { color: rgba(255,255,255,0.7); }
+  .tip-close:hover { color: var(--navy); }
 
   .tip-next {
-    background: var(--beacon);
+    background: var(--navy);
     color: #fff;
     border: none;
     border-radius: 5px;
     padding: 7px 18px;
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     font-weight: 700;
     cursor: pointer;
     font-family: 'Montserrat', sans-serif;
     transition: background 0.15s;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
   }
-  .tip-next:hover { background: #d99200; }
+  .tip-next:hover { background: var(--blue); }
 
   /* ── Highlight ring ── */
   .hl-ring {
     display: none;
     position: absolute;
-    border: 2.5px solid var(--beacon);
+    border: 2.5px solid var(--blue);
     border-radius: 6px;
     pointer-events: none;
     z-index: 90;
-    box-shadow: 0 0 0 4px var(--beacon-ring);
+    box-shadow: 0 0 0 4px rgba(0,94,156,0.18);
     transition: all 0.3s cubic-bezier(0.34,1.2,0.64,1);
   }
   .hl-ring.visible { display: block; }
 
-  /* ── Intro card ── */
+  /* ── Intro card — matches popup style ── */
   .intro-card {
     display: none;
     position: absolute;
@@ -222,112 +231,136 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 120;
-    background: var(--navy);
-    color: #fff;
-    border-radius: 12px;
-    padding: 28px 26px;
+    background: var(--white);
+    border-radius: 10px;
+    padding: 0;
     max-width: 360px;
     width: 90%;
     box-shadow: var(--shadow);
     text-align: center;
     animation: tipIn 0.3s ease;
-    border: 1px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+    border: 1px solid var(--border);
   }
   .intro-card.visible { display: block; }
 
-  .intro-card .logo {
-    font-size: 2rem;
-    margin-bottom: 10px;
+  .intro-header {
+    background: var(--navy);
+    padding: 20px 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
 
-  .intro-card h2 {
+  .intro-logo {
+    width: 54px; height: 54px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+
+  .intro-header h2 {
     font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 800;
-    margin-bottom: 8px;
     color: #fff;
     letter-spacing: -0.01em;
   }
 
-  .intro-card p {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.72);
+  .intro-header p {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.65);
+    font-weight: 400;
+  }
+
+  .intro-body {
+    padding: 16px 20px 20px;
+  }
+
+  .intro-body p {
+    font-size: 0.76rem;
+    color: var(--text);
     line-height: 1.6;
-    margin-bottom: 18px;
+    margin-bottom: 14px;
     font-weight: 400;
   }
 
   .beacon-hint {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.72rem;
-    color: var(--beacon);
+    gap: 10px;
+    font-size: 0.7rem;
+    color: var(--navy);
     font-weight: 600;
-    margin-bottom: 18px;
-    background: rgba(240,165,0,0.1);
-    padding: 7px 14px;
-    border-radius: 20px;
-    border: 1px solid rgba(240,165,0,0.3);
+    margin-bottom: 16px;
+    background: var(--light);
+    padding: 9px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .sample-beacon {
+    width: 28px; height: 28px;
+    background: var(--navy);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,70,118,0.3);
   }
 
   .intro-start {
-    background: var(--beacon);
+    background: var(--navy);
     color: #fff;
     border: none;
-    border-radius: 7px;
-    padding: 11px 28px;
+    border-radius: 6px;
+    padding: 12px 28px;
     font-weight: 700;
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     cursor: pointer;
     font-family: 'Montserrat', sans-serif;
     transition: all 0.15s;
     width: 100%;
-    letter-spacing: 0.02em;
-  }
-  .intro-start:hover { background: #d99200; transform: translateY(-1px); }
-
-  /* ── Exit bar at bottom ── */
-  .exit-bar {
-    display: none;
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    z-index: 100;
-    background: var(--navy);
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-
-  .exit-bar span {
-    font-size: 0.68rem;
-    color: rgba(255,255,255,0.5);
-    font-weight: 500;
-  }
-
-  .exit-bar a {
-    background: transparent;
-    color: rgba(255,255,255,0.7);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 5px;
-    padding: 6px 16px;
-    font-size: 0.68rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
-    text-decoration: none;
-    transition: all 0.15s;
     letter-spacing: 0.03em;
   }
-  .exit-bar a:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
+  .intro-start:hover { background: var(--blue); }
+
+  /* ── Exit button — big, obvious, floating ── */
+  .exit-btn {
+    display: none;
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 105;
+    background: var(--white);
+    color: var(--navy);
+    border: 2px solid var(--navy);
+    border-radius: 8px;
+    padding: 13px 36px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    box-shadow: var(--shadow);
+    transition: all 0.15s;
+    white-space: nowrap;
   }
+  .exit-btn:hover {
+    background: var(--navy);
+    color: #fff;
+    transform: translateX(-50%) translateY(-2px);
+  }
+  .exit-btn.visible { display: block; }
 
   @media (max-width: 480px) {
-    .tour-tip { width: 250px; }
+    .tour-tip { width: 252px; }
+    .exit-btn { bottom: 16px; padding: 11px 28px; font-size: 0.75rem; }
   }
 </style>
 </head>
@@ -337,15 +370,12 @@
 
   <iframe
     id="mapFrame"
-    src="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/"
+    src="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/#views=All+Layers"
     title="Salisbury OneMap"
     allowfullscreen>
   </iframe>
 
-  <!-- Light overlay -->
   <div class="tour-overlay" id="tourOverlay"></div>
-
-  <!-- Highlight ring -->
   <div class="hl-ring" id="hlRing"></div>
 
   <!-- 7 Beacons -->
@@ -369,28 +399,40 @@
       <div class="tip-callout" id="tipCallout"></div>
     </div>
     <div class="tip-footer">
-      <button class="tip-exit" onclick="closeTip()">Close</button>
+      <button class="tip-close" onclick="closeTip()">Close</button>
       <button class="tip-next" id="tipNext" onclick="nextTip()">Next →</button>
     </div>
   </div>
 
   <!-- Intro card -->
   <div class="intro-card" id="introCard">
-    <div class="logo">🗺️</div>
-    <h2>Welcome to Salisbury OneMap</h2>
-    <p>This interactive map brings together City of Salisbury data in one place — from zoning and floodplains to trash pickup days and polling locations.</p>
-    <div class="beacon-hint">
-      <span style="background:var(--beacon);border-radius:50%;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#fff">1</span>
-      Tap the glowing numbers to explore
+    <div class="intro-header">
+      <img
+        class="intro-logo"
+        src="https://salisbury.maps.arcgis.com/sharing/rest/content/items/5390374232b241d5991cdb06c32e3640/data"
+        alt="City of Salisbury"
+        onerror="this.style.display='none'">
+      <h2>Salisbury OneMap</h2>
+      <p>City of Salisbury, Maryland</p>
     </div>
-    <button class="intro-start" onclick="showBeacons()">Start the tour →</button>
+    <div class="intro-body">
+      <p>This interactive map brings City data together in one place — from zoning and floodplains to trash pickup days and polling locations.</p>
+      <div class="beacon-hint">
+        <div class="sample-beacon">1</div>
+        <span>Tap the numbered markers to learn about each tool</span>
+      </div>
+      <button class="intro-start" onclick="showBeacons()">Start the Tour →</button>
+    </div>
   </div>
 
-  <!-- Exit bar -->
-  <div class="exit-bar" id="exitBar">
-    <span>Salisbury OneMap Tour</span>
-    <a href="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/" target="_top">← Exit tour &amp; return to OneMap</a>
-  </div>
+  <!-- Exit button -->
+  <a
+    class="exit-btn"
+    id="exitBtn"
+    href="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/"
+    target="_top">
+    ← Exit Tour &amp; Return to OneMap
+  </a>
 
 </div>
 
@@ -398,58 +440,55 @@
 let tourActive = false;
 let currentTip = -1;
 
-// ── Tour stops ──
-// Positions tuned from screenshot: [xPct, yPct]
-// Desktop positions based on actual screenshot observation
 const stops = [
   {
     icon: '🔍',
     title: 'Address Search',
     body: 'Type any Salisbury address to instantly generate a full property report — your City Council district and representative, trash pickup day, zoning, floodplain status, police sector, fire station, polling location, and more.',
-    callout: '💡 This is the fastest way to answer "what city services apply to my address?" — all in one place.',
-    pos: { desk: [76, 7], mob: [75, 8] }
+    callout: '💡 This is the fastest way to answer "what city services apply to my address?" — all from a single search.',
+    pos: { desk: [76, 7], mob: [72, 8] }
   },
   {
     icon: '🗂',
     title: 'Layer Categories',
-    body: 'These buttons filter the layer list by topic — Infrastructure, Planning, Environment, Safety, and Community. They help you find relevant layers faster without scrolling through the full list.',
-    callout: '💡 Selecting a category filters the list but does not turn layers on automatically — check the box next to any layer to display it on the map.',
-    pos: { desk: [14, 12], mob: [50, 92] }
+    body: 'These buttons filter the layer list by topic — Infrastructure, Planning, Environment, Safety, and Community. They help you find layers faster without scrolling the full list.',
+    callout: '💡 Categories filter the list only — they do not turn layers on automatically. Check the box next to a layer to display it on the map.',
+    pos: { desk: [14, 12], mob: [50, 93] }
   },
   {
     icon: '📋',
     title: 'Layer List',
     body: 'Check any layer\'s box to show it on the map. Some layers only appear at closer zoom levels — if a layer isn\'t showing after you check it, try zooming in.',
-    callout: '💡 Click the ··· next to any layer for extra options: zoom to it, adjust transparency, set a filter, or export the data.',
-    pos: { desk: [12, 50], mob: [12, 55] }
+    callout: '💡 Click ··· next to any layer for extra options: zoom to it, adjust transparency, set a filter, or export data.',
+    pos: { desk: [12, 48], mob: [12, 55] }
   },
   {
     icon: '🔖',
     title: 'Menu & Bookmarks',
-    body: 'The menu in the top-right contains curated Bookmarks — these go further than categories. A bookmark zooms you to a specific area AND automatically turns on the relevant layers for you.',
+    body: 'The menu in the top-right contains curated Bookmarks — these go further than categories. A bookmark zooms you to a specific area AND automatically turns on the relevant layers.',
     callout: '💡 If you\'re not sure where to start, bookmarks are the quickest way to jump into a topic without configuring anything manually.',
-    pos: { desk: [97, 4], mob: [88, 4] }
+    pos: { desk: [97, 4], mob: [90, 4] }
   },
   {
     icon: '🛠',
     title: 'Map Tools',
-    body: 'The toolbar on the right gives you powerful tools: Draw to sketch on the map, Measure distances and areas, Elevation Profile along any path, and Coordinates to identify any location.',
+    body: 'The right toolbar gives you powerful tools: Draw to sketch on the map, Measure distances and areas, Elevation Profile along any path, and Coordinates to identify any location.',
     callout: '💡 Use the Share tool to copy a URL that preserves exactly what you\'re looking at — the view, active layers, and location.',
-    pos: { desk: [97, 50], mob: null }
+    pos: { desk: [97, 45], mob: null }
   },
   {
     icon: '📊',
     title: 'Data Table',
-    body: 'See the small arrow at the bottom center of the map? Click it to open a data drawer showing a full table of records from your visible layers — great for browsing, sorting, and reviewing multiple features at once.',
+    body: 'See the small arrow at the bottom center of the map? Click it to open a data drawer with a full table of records from your visible layers — great for browsing, sorting, and reviewing multiple features at once.',
     callout: '💡 The table updates based on what layers are turned on and what\'s visible in your current map view.',
-    pos: { desk: [50, 90], mob: [50, 82] }
+    pos: { desk: [50, 88], mob: [50, 80] }
   },
   {
     icon: '🛰',
     title: 'Basemap Gallery',
-    body: 'Switch between different basemaps including standard Esri street and topographic maps, or high-resolution NearMap aerial imagery — updated far more frequently than standard satellite views.',
+    body: 'Switch between Esri street and topographic maps, or high-resolution NearMap aerial imagery — updated far more frequently than standard satellite views.',
     callout: '💡 NearMap is great for seeing recent construction, lot changes, or fine property-level detail that older imagery misses.',
-    pos: { desk: [97, 28], mob: [88, 14] }
+    pos: { desk: [97, 24], mob: [90, 14] }
   },
 ];
 
@@ -460,24 +499,23 @@ function positionBeacons() {
   const rect = getRect();
   const mobile = isMobile();
   stops.forEach((stop, i) => {
-    const beacon = document.getElementById('b' + i);
+    const b = document.getElementById('b' + i);
     const pos = mobile ? stop.pos.mob : stop.pos.desk;
-    if (!pos) { beacon.style.display = 'none'; return; }
-    beacon.style.display = '';
-    beacon.style.left = (pos[0] / 100 * rect.width)  + 'px';
-    beacon.style.top  = (pos[1] / 100 * rect.height) + 'px';
+    if (!pos) { b.style.display = 'none'; return; }
+    b.style.display = '';
+    b.style.left = (pos[0] / 100 * rect.width)  + 'px';
+    b.style.top  = (pos[1] / 100 * rect.height) + 'px';
   });
 }
 
 const ro = new ResizeObserver(() => { if (tourActive) positionBeacons(); });
 ro.observe(document.getElementById('mapWrapper'));
 
-// Auto-start tour on load
 window.addEventListener('load', () => {
   tourActive = true;
   document.getElementById('tourOverlay').classList.add('active');
   document.getElementById('introCard').classList.add('visible');
-  document.getElementById('exitBar').style.display = 'flex';
+  document.getElementById('exitBtn').classList.add('visible');
 });
 
 function showBeacons() {
@@ -498,39 +536,34 @@ function openTip(index) {
   document.getElementById('tipBody').textContent    = stop.body;
   document.getElementById('tipCallout').textContent = stop.callout;
 
-  // Count visible stops
-  const visibleCount = stops.filter(s => mobile ? s.pos.mob : s.pos.desk).length;
-  let visibleIndex = 0;
-  for (let i = 0; i <= index; i++) {
-    if (mobile ? stops[i].pos.mob : stops[i].pos.desk) visibleIndex++;
-  }
-  document.getElementById('tipCounter').textContent = `${visibleIndex} / ${visibleCount}`;
-  document.getElementById('tipNext').textContent = index < stops.length - 1 ? 'Next →' : 'Done ✓';
+  const visibleStops = stops.filter(s => mobile ? s.pos.mob : s.pos.desk);
+  const visibleIndex = visibleStops.findIndex((s, i) => stops.indexOf(s) === index);
+  document.getElementById('tipCounter').textContent = `${visibleIndex + 1} / ${visibleStops.length}`;
+  document.getElementById('tipNext').textContent    = visibleIndex < visibleStops.length - 1 ? 'Next →' : 'Done ✓';
 
   const rect = getRect();
   const bx = pos[0] / 100 * rect.width;
   const by = pos[1] / 100 * rect.height;
   const tip = document.getElementById('tourTip');
-  const tipW = mobile ? 250 : 290;
-  const tipH = 230;
+  const tipW = mobile ? 252 : 290;
+  const tipH = 235;
 
-  let tx = bx + 42, ty = by - 70;
-  if (tx + tipW > rect.width - 10)  tx = bx - tipW - 16;
+  let tx = bx + 44, ty = by - 70;
+  if (tx + tipW > rect.width  - 10) tx = bx - tipW - 16;
   if (tx < 10) tx = 10;
-  if (ty < 10) ty = by + 42;
-  if (ty + tipH > rect.height - 60) ty = rect.height - tipH - 60;
+  if (ty < 10) ty = by + 44;
+  if (ty + tipH > rect.height - 70) ty = rect.height - tipH - 70;
 
   tip.style.left  = tx + 'px';
   tip.style.top   = ty + 'px';
   tip.style.width = tipW + 'px';
   tip.classList.add('visible');
 
-  // Highlight
   const hl = document.getElementById('hlRing');
-  hl.style.left   = (bx - 22) + 'px';
-  hl.style.top    = (by - 22) + 'px';
-  hl.style.width  = '44px';
-  hl.style.height = '44px';
+  hl.style.left   = (bx - 23) + 'px';
+  hl.style.top    = (by - 23) + 'px';
+  hl.style.width  = '46px';
+  hl.style.height = '46px';
   hl.classList.add('visible');
 }
 
@@ -543,8 +576,8 @@ function nextTip() {
   const mobile = isMobile();
   let next = currentTip + 1;
   while (next < stops.length && mobile && !stops[next].pos.mob) next++;
-  if (next < stops.length) { openTip(next); }
-  else { closeTip(); }
+  if (next < stops.length) openTip(next);
+  else closeTip();
 }
 
 window.addEventListener('resize', () => { if (tourActive) positionBeacons(); });
