@@ -24,24 +24,33 @@
     background: #000;
     height: 100vh;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
   }
 
+  /* ── Locked 1920×1080 coordinate space ──
+     The wrapper always matches the screenshot's aspect ratio.
+     Beacons sit at consistent % positions no matter the screen size. */
   .map-wrapper {
-    flex: 1;
     position: relative;
+    width:  min(100vw, calc(100vh * 1920 / 1080));
+    height: min(100vh, calc(100vw * 1080 / 1920));
     overflow: hidden;
+    flex-shrink: 0;
   }
 
-  #mapFrame {
+  #mapImg {
     width: 100%;
     height: 100%;
-    border: none;
+    object-fit: fill;   /* no cropping — coordinate system is exact */
     display: block;
+    user-select: none;
+    pointer-events: none;
+    -webkit-user-drag: none;
   }
 
-  /* Light tint only — no blur */
+  /* Light tint */
   .tour-overlay {
     display: none;
     position: absolute;
@@ -104,12 +113,12 @@
     100% { width: 82px; height: 82px; opacity: 0; }
   }
 
-  /* ── Tooltip — matches address popup style ── */
+  /* ── Tooltip ── */
   .tour-tip {
     display: none;
     position: absolute;
     z-index: 110;
-    width: 290px;
+    width: 300px;
     background: var(--white);
     border-radius: 8px;
     box-shadow: var(--shadow);
@@ -124,7 +133,6 @@
     to   { opacity: 1; transform: translateY(0) scale(1); }
   }
 
-  /* Header matches address popup navy header */
   .tip-header {
     background: var(--navy);
     padding: 12px 16px;
@@ -132,9 +140,7 @@
     align-items: center;
     gap: 10px;
   }
-
-  .tip-icon { font-size: 1.1rem; }
-
+  .tip-icon  { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:20px; height:20px; }
   .tip-title {
     font-family: 'Montserrat', sans-serif;
     color: #fff;
@@ -142,7 +148,6 @@
     font-weight: 700;
     letter-spacing: 0.01em;
   }
-
   .tip-counter {
     margin-left: auto;
     font-size: 0.58rem;
@@ -152,7 +157,22 @@
     font-weight: 500;
   }
 
-  /* Body matches popup card white bg */
+  /* Mini screenshot inside tooltip */
+  .tip-img-wrap {
+    display: none;
+    width: 100%;
+    height: 148px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .tip-img-wrap.has-img { display: block; }
+  .tip-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+  }
+
   .tip-body {
     padding: 13px 16px 6px;
     font-size: 0.75rem;
@@ -161,7 +181,6 @@
     font-weight: 400;
   }
 
-  /* Callout matches popup section style */
   .tip-callout {
     margin: 10px 0 6px;
     padding: 9px 12px;
@@ -174,15 +193,32 @@
     font-weight: 500;
   }
 
+  /* Scribe link row */
+  .tip-scribe-row {
+    display: none;
+    padding: 0 16px 10px;
+  }
+  .tip-scribe-row.has-scribe { display: block; }
+  .tip-scribe-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--blue);
+    text-decoration: none;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .tip-scribe-link:hover { text-decoration: underline; }
+
   .tip-footer {
     padding: 10px 16px 13px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-top: 1px solid var(--border);
-    margin-top: 8px;
+    margin-top: 4px;
   }
-
   .tip-close {
     font-size: 0.62rem;
     color: var(--muted);
@@ -194,7 +230,6 @@
     font-weight: 500;
   }
   .tip-close:hover { color: var(--navy); }
-
   .tip-next {
     background: var(--navy);
     color: #fff;
@@ -223,17 +258,15 @@
   }
   .hl-ring.visible { display: block; }
 
-  /* ── Intro card — matches popup style ── */
+  /* ── Intro card ── */
   .intro-card {
     display: none;
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     z-index: 120;
     background: var(--white);
     border-radius: 10px;
-    padding: 0;
     max-width: 360px;
     width: 90%;
     box-shadow: var(--shadow);
@@ -252,13 +285,11 @@
     align-items: center;
     gap: 10px;
   }
-
   .intro-logo {
     width: 54px; height: 54px;
     object-fit: contain;
     filter: brightness(0) invert(1);
   }
-
   .intro-header h2 {
     font-family: 'Montserrat', sans-serif;
     font-size: 1.05rem;
@@ -266,17 +297,12 @@
     color: #fff;
     letter-spacing: -0.01em;
   }
-
   .intro-header p {
     font-size: 0.68rem;
     color: rgba(255,255,255,0.65);
     font-weight: 400;
   }
-
-  .intro-body {
-    padding: 16px 20px 20px;
-  }
-
+  .intro-body { padding: 16px 20px 20px; }
   .intro-body p {
     font-size: 0.76rem;
     color: var(--text);
@@ -284,7 +310,6 @@
     margin-bottom: 14px;
     font-weight: 400;
   }
-
   .beacon-hint {
     display: flex;
     align-items: center;
@@ -299,7 +324,6 @@
     border: 1px solid var(--border);
     text-align: left;
   }
-
   .sample-beacon {
     width: 28px; height: 28px;
     background: var(--navy);
@@ -311,7 +335,6 @@
     flex-shrink: 0;
     box-shadow: 0 2px 8px rgba(0,70,118,0.3);
   }
-
   .intro-start {
     background: var(--navy);
     color: #fff;
@@ -328,7 +351,7 @@
   }
   .intro-start:hover { background: var(--blue); }
 
-  /* ── Exit button — big, obvious, floating ── */
+  /* ── Exit button ── */
   .exit-btn {
     display: none;
     position: absolute;
@@ -357,50 +380,52 @@
     transform: translateX(-50%) translateY(-2px);
   }
   .exit-btn.visible { display: block; }
-
-  @media (max-width: 480px) {
-    .tour-tip { width: 252px; }
-    .exit-btn { bottom: 16px; padding: 11px 28px; font-size: 0.75rem; }
-  }
 </style>
 </head>
 <body>
 
 <div class="map-wrapper" id="mapWrapper">
 
-  <iframe
-    id="mapFrame"
-    src="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/"
-    title="Salisbury OneMap"
-    allowfullscreen>
-  </iframe>
+  <!--
+    Replace src with your screenshot filename.
+    Keep it in the same repo folder as tour.html.
+    Captured at 1920x1080, fullscreen browser, default app state.
+  -->
+  <img id="mapImg" src="onemap-screenshot.png" alt="Salisbury OneMap" draggable="false">
 
   <div class="tour-overlay" id="tourOverlay"></div>
-  <div class="hl-ring" id="hlRing"></div>
+  <div class="hl-ring"      id="hlRing"></div>
 
-  <!-- 7 Beacons -->
+  <!-- 6 Beacons -->
   <div class="beacon" id="b0" onclick="openTip(0)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">1</div></div></div>
   <div class="beacon" id="b1" onclick="openTip(1)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">2</div></div></div>
   <div class="beacon" id="b2" onclick="openTip(2)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">3</div></div></div>
   <div class="beacon" id="b3" onclick="openTip(3)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">4</div></div></div>
   <div class="beacon" id="b4" onclick="openTip(4)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">5</div></div></div>
   <div class="beacon" id="b5" onclick="openTip(5)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">6</div></div></div>
-  <div class="beacon" id="b6" onclick="openTip(6)"><div class="beacon-core"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="beacon-dot">7</div></div></div>
 
   <!-- Tooltip -->
   <div class="tour-tip" id="tourTip">
     <div class="tip-header">
-      <span class="tip-icon" id="tipIcon">🔍</span>
-      <span class="tip-title" id="tipTitle">Search</span>
-      <span class="tip-counter" id="tipCounter">1 / 7</span>
+      <span class="tip-icon"    id="tipIcon">🗂</span>
+      <span class="tip-title"   id="tipTitle">Layer Categories</span>
+      <span class="tip-counter" id="tipCounter">1 / 6</span>
+    </div>
+    <div class="tip-img-wrap" id="tipImgWrap">
+      <img id="tipImg" src="" alt="">
     </div>
     <div class="tip-body">
       <div id="tipBody"></div>
       <div class="tip-callout" id="tipCallout"></div>
     </div>
+    <div class="tip-scribe-row" id="tipScribeRow">
+      <a class="tip-scribe-link" id="tipScribeLink" href="#" target="_blank">
+        📖 Step-by-step guide
+      </a>
+    </div>
     <div class="tip-footer">
       <button class="tip-close" onclick="closeTip()">Close</button>
-      <button class="tip-next" id="tipNext" onclick="nextTip()">Next →</button>
+      <button class="tip-next"  id="tipNext" onclick="nextTip()">Next →</button>
     </div>
   </div>
 
@@ -416,22 +441,20 @@
       <p>City of Salisbury, Maryland</p>
     </div>
     <div class="intro-body">
-      <p>This interactive map brings City data together in one place — from zoning and floodplains to trash pickup days and polling locations.</p>
+      <p>This interactive map brings City data together in one place — layers, address lookups, bookmarks, and more. This quick tour shows you where everything lives.</p>
       <div class="beacon-hint">
         <div class="sample-beacon">1</div>
-        <span>Tap the numbered markers to learn about each tool</span>
+        <span>Click the numbered markers to learn about each tool</span>
       </div>
       <button class="intro-start" onclick="showBeacons()">Start the Tour →</button>
     </div>
   </div>
 
-  <!-- Exit button -->
-  <a
-    class="exit-btn"
-    id="exitBtn"
-    href="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/"
-    target="_top">
-    ← Exit Tour &amp; Return to OneMap
+  <!-- Exit -->
+  <a class="exit-btn" id="exitBtn"
+     href="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/"
+     target="_top">
+    ← Open Salisbury OneMap
   </a>
 
 </div>
@@ -440,67 +463,103 @@
 let tourActive = false;
 let currentTip = -1;
 
+// ─────────────────────────────────────────────────────────
+// STOPS — 6 features
+//
+// pos:   [x%, y%] from top-left of the wrapper.
+//         POSITIONS ARE STUBS — will be updated once the
+//         1920×1080 fullscreen screenshot is dropped in.
+//
+// img:   URL to mini screenshot shown inside the tooltip.
+//         Can be a GitHub raw URL or relative path.
+//         Set to null to show no image for that stop.
+//
+// scribe: Full URL to the Scribe guide for this feature.
+//         Set to null to hide the link.
+// ─────────────────────────────────────────────────────────
+const SVG = {
+  filter:   `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>`,
+  list:     `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1.2" fill="white" stroke="none"/><circle cx="3" cy="12" r="1.2" fill="white" stroke="none"/><circle cx="3" cy="18" r="1.2" fill="white" stroke="none"/></svg>`,
+  search:   `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+  tools:    `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
+  menu:     `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`,
+  reset:    `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>`,
+};
+
 const stops = [
   {
-    icon: '🔍',
-    title: 'Address Search',
-    body: 'Type any Salisbury address to instantly generate a full property report — your City Council district and representative, trash pickup day, zoning, floodplain status, police sector, fire station, polling location, and more.',
-    callout: '💡 This is the fastest way to answer "what city services apply to my address?" — all from a single search.',
-    pos: { desk: [72, 6], mob: [72, 8] }
-  },
-  {
-    icon: '🗂',
+    icon: SVG.filter,
     title: 'Layer Categories',
-    body: 'These buttons filter the layer list by topic — Infrastructure, Planning, Environment, Safety, and Community. They help you find layers faster without scrolling the full list.',
-    callout: '💡 Categories filter the list only — they do not turn layers on automatically. Check the box next to a layer to display it on the map.',
-    pos: { desk: [13, 9], mob: [50, 93] }
+    body: 'The buttons at the top of the panel filter the layer list by topic — Infrastructure, Planning, Environment, Safety, and Community. Use them to narrow down the list without scrolling through everything.',
+    callout: '💡 These buttons filter the list only — they do not turn layers on. Check the box next to any layer name to display it on the map.',
+    img: null,     // add a cropped screenshot: 'img/categories.png'
+    scribe: null,  // add your Scribe URL: 'https://scribehow.com/...'
+    pos: { desk: [10, 14] }
   },
   {
-    icon: '📋',
+    icon: SVG.list,
     title: 'Layer List',
-    body: 'Check any layer\'s box to show it on the map. Some layers only appear at closer zoom levels — if a layer isn\'t showing after you check it, try zooming in.',
-    callout: '💡 Click ··· next to any layer for extra options: zoom to it, adjust transparency, set a filter, or export data.',
-    pos: { desk: [11, 46], mob: [11, 55] }
+    body: 'Check any layer\'s box to display it on the map. Click the ··· next to any layer name for additional options: zoom to it, adjust transparency, set a filter, calculate statistics, or export to a variety of formats.',
+    callout: '💡 If a layer name appears greyed out after you check it, you may need to zoom in or out — some layers only display within a specific scale range.',
+    img: null,
+    scribe: null,
+    pos: { desk: [10, 53] }
   },
   {
-    icon: '🔖',
-    title: 'Menu & Bookmarks',
-    body: 'The menu in the top-right contains curated Bookmarks — these go further than categories. A bookmark zooms you to a specific area AND automatically turns on the relevant layers.',
-    callout: '💡 If you\'re not sure where to start, bookmarks are the quickest way to jump into a topic without configuring anything manually.',
-    pos: { desk: [98, 4], mob: [90, 4] }
+    icon: SVG.search,
+    title: 'Address Search',
+    body: 'Type any Salisbury address to zoom directly to it and open a detailed report. Results include your City Council district and representative, trash pickup day, zoning, floodplain status, police sector, fire station, polling location, and more.',
+    callout: '💡 This search is scoped to Salisbury addresses. Select your address from the dropdown to get the full spatial report.',
+    img: null,
+    scribe: null,
+    pos: { desk: [84, 11] }
   },
   {
-    icon: '🛠',
+    icon: SVG.tools,
     title: 'Map Tools',
-    body: 'The right toolbar gives you powerful tools: Draw to sketch on the map, Measure distances and areas, Elevation Profile along any path, and Coordinates to identify any location.',
-    callout: '💡 Use the Share tool to copy a URL that preserves exactly what you\'re looking at — the view, active layers, and location.',
-    pos: { desk: [98, 48], mob: null }
+    body: 'The toolbar on the right edge of the map gives you: Draw, Measure, Add Data, Select, Elevation Profile, and Coordinates. Below those are the Basemap Gallery, Legend, Bookmarks, and Print.',
+    callout: '⭐ Bookmarks are the power feature — they jump you to a specific area of the city AND automatically turn on a curated set of layers. No configuration needed.',
+    img: null,
+    scribe: null,
+    pos: { desk: [99, 27] }
   },
   {
-    icon: '📊',
-    title: 'Data Table',
-    body: 'See the small arrow at the bottom center of the map? Click it to open a data drawer with a full table of records from your visible layers — great for browsing, sorting, and reviewing multiple features at once.',
-    callout: '💡 The table updates based on what layers are turned on and what\'s visible in your current map view.',
-    pos: { desk: [50, 93], mob: [50, 85] }
+    icon: SVG.menu,
+    title: 'Menu',
+    body: 'The menu in the top-right corner of the header links to additional resources: step-by-step guides for each tool, our Open Data Hub, and a way to submit feedback on the map.',
+    callout: '💡 The step-by-step guides walk through each feature in detail — great if you want to go deeper on anything covered in this tour.',
+    img: null,
+    scribe: null,
+    pos: { desk: [99, 3] }
   },
   {
-    icon: '🛰',
-    title: 'Basemap Gallery',
-    body: 'Switch between Esri street and topographic maps, or high-resolution NearMap aerial imagery — updated far more frequently than standard satellite views.',
-    callout: '💡 NearMap is great for seeing recent construction, lot changes, or fine property-level detail that older imagery misses.',
-    pos: { desk: [98, 20], mob: [90, 14] }
+    icon: SVG.reset,
+    title: 'Reset Map',
+    body: 'The reset button in the bottom-right corner returns the map to its default state — original extent, all layers turned off, basemap restored.',
+    callout: '💡 If the map ever looks unexpected — wrong zoom level, too many layers on, wrong basemap — this one click brings it back to a clean start.',
+    img: null,
+    scribe: null,
+    pos: { desk: [98, 94] }
   },
 ];
 
-function isMobile() { return window.innerWidth <= 600; }
-function getRect()  { return document.getElementById('mapWrapper').getBoundingClientRect(); }
+// ─── Debug helper: add ?debug to URL, click anywhere to log [x%, y%] ───
+if (location.search.includes('debug')) {
+  document.getElementById('mapWrapper').addEventListener('click', function(e) {
+    const r = this.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+    const y = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+    console.log(`[${x}, ${y}]`);
+  }, true);
+}
+
+function getRect() { return document.getElementById('mapWrapper').getBoundingClientRect(); }
 
 function positionBeacons() {
   const rect = getRect();
-  const mobile = isMobile();
   stops.forEach((stop, i) => {
-    const b = document.getElementById('b' + i);
-    const pos = mobile ? stop.pos.mob : stop.pos.desk;
+    const b   = document.getElementById('b' + i);
+    const pos = stop.pos.desk;
     if (!pos) { b.style.display = 'none'; return; }
     b.style.display = '';
     b.style.left = (pos[0] / 100 * rect.width)  + 'px';
@@ -527,38 +586,59 @@ function showBeacons() {
 function openTip(index) {
   currentTip = index;
   const stop = stops[index];
-  const mobile = isMobile();
-  const pos = mobile ? stop.pos.mob : stop.pos.desk;
+  const pos  = stop.pos.desk;
   if (!pos) return;
 
-  document.getElementById('tipIcon').textContent    = stop.icon;
+  // Populate text
+  document.getElementById('tipIcon').innerHTML      = stop.icon;
   document.getElementById('tipTitle').textContent   = stop.title;
   document.getElementById('tipBody').textContent    = stop.body;
   document.getElementById('tipCallout').textContent = stop.callout;
+  document.getElementById('tipCounter').textContent = `${index + 1} / ${stops.length}`;
+  document.getElementById('tipNext').textContent    = index < stops.length - 1 ? 'Next →' : 'Done ✓';
 
-  const visibleStops = stops.filter(s => mobile ? s.pos.mob : s.pos.desk);
-  const visibleIndex = visibleStops.findIndex((s, i) => stops.indexOf(s) === index);
-  document.getElementById('tipCounter').textContent = `${visibleIndex + 1} / ${visibleStops.length}`;
-  document.getElementById('tipNext').textContent    = visibleIndex < visibleStops.length - 1 ? 'Next →' : 'Done ✓';
+  // Mini image
+  const imgWrap = document.getElementById('tipImgWrap');
+  const imgEl   = document.getElementById('tipImg');
+  if (stop.img) {
+    imgEl.src = stop.img;
+    imgWrap.classList.add('has-img');
+  } else {
+    imgWrap.classList.remove('has-img');
+    imgEl.src = '';
+  }
 
+  // Scribe link
+  const scribeRow  = document.getElementById('tipScribeRow');
+  const scribeLink = document.getElementById('tipScribeLink');
+  if (stop.scribe) {
+    scribeLink.href = stop.scribe;
+    scribeRow.classList.add('has-scribe');
+  } else {
+    scribeRow.classList.remove('has-scribe');
+  }
+
+  // Position tooltip
   const rect = getRect();
-  const bx = pos[0] / 100 * rect.width;
-  const by = pos[1] / 100 * rect.height;
-  const tip = document.getElementById('tourTip');
-  const tipW = mobile ? 252 : 290;
-  const tipH = 235;
+  const bx   = pos[0] / 100 * rect.width;
+  const by   = pos[1] / 100 * rect.height;
+  const tip  = document.getElementById('tourTip');
+  const tipW = 300;
 
-  let tx = bx + 44, ty = by - 70;
-  if (tx + tipW > rect.width  - 10) tx = bx - tipW - 16;
-  if (tx < 10) tx = 10;
-  if (ty < 10) ty = by + 44;
-  if (ty + tipH > rect.height - 70) ty = rect.height - tipH - 70;
-
-  tip.style.left  = tx + 'px';
-  tip.style.top   = ty + 'px';
-  tip.style.width = tipW + 'px';
+  tip.style.width   = tipW + 'px';
   tip.classList.add('visible');
+  const tipH = tip.offsetHeight;  // measure actual height after content is set
 
+  let tx = bx + 48, ty = by - 60;
+  if (tx + tipW > rect.width  - 10) tx = bx - tipW - 18;
+  if (tx < 10)                       tx = 10;
+  if (ty < 10)                       ty = by + 48;
+  if (ty + tipH > rect.height - 80)  ty = rect.height - tipH - 80;
+
+  tip.style.left = tx + 'px';
+  tip.style.top  = ty + 'px';
+
+  // Highlight ring
   const hl = document.getElementById('hlRing');
   hl.style.left   = (bx - 23) + 'px';
   hl.style.top    = (by - 23) + 'px';
@@ -573,14 +653,11 @@ function closeTip() {
 }
 
 function nextTip() {
-  const mobile = isMobile();
-  let next = currentTip + 1;
-  while (next < stops.length && mobile && !stops[next].pos.mob) next++;
-  if (next < stops.length) openTip(next);
+  if (currentTip < stops.length - 1) openTip(currentTip + 1);
   else closeTip();
 }
 
-window.addEventListener('resize', () => { if (tourActive) positionBeacons(); });
+window.addEventListener('resize',  () => { if (tourActive) positionBeacons(); });
 window.addEventListener('keydown', e => { if (e.key === 'Escape') closeTip(); });
 </script>
 </body>
