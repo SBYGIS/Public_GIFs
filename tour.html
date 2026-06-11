@@ -23,21 +23,17 @@
     font-family: 'Montserrat', sans-serif;
     background: #000;
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
+    position: relative;
   }
 
-  /* ── Locked 1920×1080 coordinate space ──
-     The wrapper always matches the screenshot's aspect ratio.
-     Beacons sit at consistent % positions no matter the screen size. */
+  /* ── Fills the viewport completely, no black bars ── */
   .map-wrapper {
-    position: relative;
-    width:  min(100vw, calc(100vh * 1920 / 1080));
-    height: min(100vh, calc(100vw * 1080 / 1920));
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    flex-shrink: 0;
   }
 
   #mapImg {
@@ -521,7 +517,7 @@ const stops = [
     callout: '⭐ Bookmarks are the power feature — they jump you to a specific area of the city AND automatically turn on a curated set of layers. No configuration needed.',
     img: null,
     scribe: null,
-    pos: { desk: [99, 27] }
+    pos: { desk: [96, 27] }
   },
   {
     icon: SVG.menu,
@@ -530,7 +526,7 @@ const stops = [
     callout: '💡 The step-by-step guides walk through each feature in detail — great if you want to go deeper on anything covered in this tour.',
     img: null,
     scribe: null,
-    pos: { desk: [99, 3] }
+    pos: { desk: [96, 4] }
   },
   {
     icon: SVG.reset,
@@ -539,7 +535,7 @@ const stops = [
     callout: '💡 If the map ever looks unexpected — wrong zoom level, too many layers on, wrong basemap — this one click brings it back to a clean start.',
     img: null,
     scribe: null,
-    pos: { desk: [98, 94] }
+    pos: { desk: [96, 90] }
   },
 ];
 
