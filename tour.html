@@ -347,35 +347,7 @@
   }
   .intro-start:hover { background: var(--blue); }
 
-  /* ── Exit button ── */
-  .exit-btn {
-    display: none;
-    position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 105;
-    background: var(--white);
-    color: var(--navy);
-    border: 2px solid var(--navy);
-    border-radius: 8px;
-    padding: 13px 36px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    font-family: 'Montserrat', sans-serif;
-    cursor: pointer;
-    text-decoration: none;
-    letter-spacing: 0.04em;
-    box-shadow: var(--shadow);
-    transition: all 0.15s;
-    white-space: nowrap;
-  }
-  .exit-btn:hover {
-    background: var(--navy);
-    color: #fff;
-    transform: translateX(-50%) translateY(-2px);
-  }
-  .exit-btn.visible { display: block; }
+
 </style>
 </head>
 <body>
@@ -446,12 +418,7 @@
     </div>
   </div>
 
-  <!-- Exit -->
-  <a class="exit-btn" id="exitBtn"
-     href="https://experience.arcgis.com/experience/8f9ed0ab14e7478ba80c577ede8fb543/"
-     target="_top">
-    ← Open Salisbury OneMap
-  </a>
+
 
 </div>
 
@@ -570,7 +537,6 @@ window.addEventListener('load', () => {
   tourActive = true;
   document.getElementById('tourOverlay').classList.add('active');
   document.getElementById('introCard').classList.add('visible');
-  document.getElementById('exitBtn').classList.add('visible');
 });
 
 function showBeacons() {
