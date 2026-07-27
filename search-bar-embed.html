@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Salisbury Address Search</title>
+<style>
+  :root {
+    --sby-brown: #6e5d50;
+    --sby-orange: #f5a623;
+    --sby-green-light: #8dc63f;
+    --sby-green: #1f9c53;
+    --sby-blue-light: #29abe2;
+    --sby-blue: #0072bc;
+    --ink: #2c2620;
+    --muted: #8a7f74;
+    --border: #e7e1da;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: transparent;
+  }
+  .card {
+    position: relative;
+    max-width: 480px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 24px 20px;
+    overflow: hidden;
+  }
+  .wave-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 70px;
+    opacity: 0.16;
+    pointer-events: none;
+  }
+  .brand-row {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .brand-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+    color: var(--sby-brown);
+    margin: 0;
+  }
+  .brand-sub {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .search-box { position: relative; }
+  .search-input-row {
+    display: flex;
+    align-items: center;
+    background: #fafaf8;
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 4px 4px 16px;
+    transition: border-color 0.15s;
+  }
+  .search-input-row:focus-within {
+    border-color: var(--sby-blue-light);
+    background: white;
+  }
+  input[type="text"] {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 10px 6px;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  input::placeholder { color: var(--muted); }
+  button.search-btn {
+    border: none;
+    background: var(--sby-blue);
+    color: white;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  button.search-btn:hover { background: #005b96; }
+  button.search-btn:disabled { background: var(--border); color: var(--muted); cursor: default; }
+
+  .suggestions {
+    margin-top: 8px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    display: none;
+    background: white;
+  }
+  .suggestions.open { display: block; }
+  .suggestion {
+    padding: 11px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .suggestion:last-child { border-bottom: none; }
+  .suggestion:hover, .suggestion.active { background: #f4f8fb; }
+  .suggestion .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--sby-green-light);
+    flex-shrink: 0;
+  }
+  .suggestion .addr { color: var(--ink); }
+  .empty {
+    padding: 12px 16px;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .footnote {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <svg class="wave-bg" viewBox="0 0 480 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,55 C60,25 120,25 180,45 C240,65 300,20 360,35 C410,47 450,30 480,20" stroke="var(--sby-blue)" stroke-width="5" fill="none"/>
+    <path d="M0,45 C60,15 120,15 180,35 C240,55 300,10 360,25 C410,37 450,20 480,10" stroke="var(--sby-green)" stroke-width="5" fill="none"/>
+    <path d="M60,20 C110,-5 160,-5 210,15 C250,30 290,0 330,10" stroke="var(--sby-orange)" stroke-width="5" fill="none"/>
+  </svg>
+
+  <div class="brand-row">
+    <h1 class="brand-title">Salisbury</h1>
+    <span class="brand-sub">Address Lookup</span>
+  </div>
+
+  <div class="search-box">
+    <div class="search-input-row">
+      <input type="text" id="addr-input" placeholder="Search your address" autocomplete="off">
+      <button class="search-btn" id="go-btn" disabled>Search</button>
+    </div>
+    <div class="suggestions" id="suggestions"></div>
+  </div>
+
+  <div class="footnote">Find your council district, polling place, zoning and more.</div>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   CONFIG
+--------------------------------------------------------- */
+const SERVICE_URL = "https://services6.arcgis.com/Hx8jJ6McXQ0jnqLk/arcgis/rest/services/Wicomico_Address_Points_TEST5/FeatureServer/0";
+const ADDRESS_FIELD = "fulladdress";
+const ID_FIELD = "OBJECTID"; // switch to a GlobalID field name if/when one is enabled on the layer
+
+// UPDATE THIS once your coworker's print page is published:
+const PRINT_PAGE_BASE = "https://sbygis.github.io/gis_print/address_info.html";
+
+/* ---------------------------------------------------------
+   DATA FETCHING
+--------------------------------------------------------- */
+async function fetchSuggestions(q) {
+  const where = `UPPER(${ADDRESS_FIELD}) LIKE UPPER('${q.replace(/'/g, "''")}%')`;
+  const url = `${SERVICE_URL}/query?where=${encodeURIComponent(where)}`
+            + `&outFields=${ADDRESS_FIELD},${ID_FIELD}&returnGeometry=false&f=json&resultRecordCount=8`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.error) { console.error("ArcGIS query error:", data.error); return []; }
+  return (data.features || [])
+    .map(f => ({ address: f.attributes[ADDRESS_FIELD], id: f.attributes[ID_FIELD] }))
+    .filter(r => r.address);
+}
+
+function buildSnapshotUrl(id) {
+  const params = new URLSearchParams();
+  params.set("id", id);
+  return `${PRINT_PAGE_BASE}?${params.toString()}`;
+}
+
+/* ---------------------------------------------------------
+   UI WIRING
+--------------------------------------------------------- */
+const input = document.getElementById('addr-input');
+const suggBox = document.getElementById('suggestions');
+const goBtn = document.getElementById('go-btn');
+
+let currentMatches = [];
+let activeIndex = -1;
+let debounceTimer = null;
+let selectedId = null;
+
+input.addEventListener('input', () => {
+  selectedId = null;
+  goBtn.disabled = true;
+  const q = input.value.trim();
+  clearTimeout(debounceTimer);
+  if (q.length < 2) { closeSuggestions(); return; }
+  debounceTimer = setTimeout(async () => {
+    currentMatches = await fetchSuggestions(q);
+    renderSuggestions(currentMatches);
+  }, 180);
+});
+
+input.addEventListener('keydown', (e) => {
+  if (!suggBox.classList.contains('open')) {
+    if (e.key === 'Enter' && selectedId) goBtn.click();
+    return;
+  }
+  const items = suggBox.querySelectorAll('.suggestion');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    activeIndex = Math.min(activeIndex + 1, items.length - 1);
+    highlight(items);
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    activeIndex = Math.max(activeIndex - 1, 0);
+    highlight(items);
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (activeIndex >= 0 && currentMatches[activeIndex]) {
+      chooseAddress(currentMatches[activeIndex]);
+    } else if (selectedId) {
+      goBtn.click();
+    }
+  } else if (e.key === 'Escape') {
+    closeSuggestions();
+  }
+});
+
+function highlight(items) {
+  items.forEach((el, i) => el.classList.toggle('active', i === activeIndex));
+}
+
+function renderSuggestions(matches) {
+  activeIndex = -1;
+  if (!matches.length) {
+    suggBox.innerHTML = `<div class="empty">No matching address found.</div>`;
+    suggBox.classList.add('open');
+    return;
+  }
+  suggBox.innerHTML = matches.map(m => `
+    <div class="suggestion" data-id="${escapeHtml(String(m.id))}" data-addr="${escapeHtml(m.address)}">
+      <span class="dot"></span>
+      <span class="addr">${escapeHtml(m.address)}</span>
+    </div>
+  `).join('');
+  suggBox.classList.add('open');
+  suggBox.querySelectorAll('.suggestion').forEach(el => {
+    el.addEventListener('click', () => chooseAddress({ id: el.dataset.id, address: el.dataset.addr }));
+  });
+}
+
+function closeSuggestions() {
+  suggBox.classList.remove('open');
+  suggBox.innerHTML = '';
+}
+
+function chooseAddress(match) {
+  input.value = match.address;
+  selectedId = match.id;
+  goBtn.disabled = false;
+  closeSuggestions();
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search-box')) closeSuggestions();
+});
+
+goBtn.addEventListener('click', () => {
+  if (!selectedId) return;
+  window.top.location.href = buildSnapshotUrl(selectedId);
+  // If you'd rather keep the host page in place and only navigate the iframe itself,
+  // use: window.location.href = buildSnapshotUrl(selectedId);
+});
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
+</body>
+</html>
