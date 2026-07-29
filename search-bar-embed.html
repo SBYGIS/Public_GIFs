@@ -116,8 +116,8 @@
    CONFIG
 --------------------------------------------------------- */
 const SERVICE_URL = "https://services6.arcgis.com/Hx8jJ6McXQ0jnqLk/arcgis/rest/services/Wicomico_Address_Points_Searchable/FeatureServer/1";
-const ADDRESS_FIELD = "search_address"; // shown to the user in the dropdown
-const SEARCH_FIELD = "search_address"; // what the query actually matches against
+const ADDRESS_FIELD = "fulladdress"; // used when building the Snapshot page URL (addr=)
+const SEARCH_FIELD = "search_address"; // what the query matches against AND what's shown in the dropdown
 const ID_FIELD = "OBJECTID"; // switch to a GlobalID field if/when one is enabled on the layer
 
 // Confirm this once your coworker's Snapshot page is published via GitHub Pages:
@@ -160,12 +160,12 @@ function deriveCityStatus(isInCity) {
 async function fetchSuggestions(q) {
   const where = `UPPER(${SEARCH_FIELD}) LIKE UPPER('${q.replace(/'/g, "''")}%')`;
   const url = `${SERVICE_URL}/query?where=${encodeURIComponent(where)}`
-            + `&outFields=${ADDRESS_FIELD},${ID_FIELD}&returnGeometry=false&f=json&resultRecordCount=8`;
+            + `&outFields=${SEARCH_FIELD},${ID_FIELD}&returnGeometry=false&f=json&resultRecordCount=8`;
   const res = await fetch(url);
   const data = await res.json();
   if (data.error) { console.error("ArcGIS query error:", data.error); return []; }
   return (data.features || [])
-    .map(f => ({ address: f.attributes[ADDRESS_FIELD], id: f.attributes[ID_FIELD] }))
+    .map(f => ({ address: f.attributes[SEARCH_FIELD], id: f.attributes[ID_FIELD] }))
     .filter(r => r.address);
 }
 
