@@ -272,11 +272,22 @@ async function selectAddress(match) {
   selectedId = match.id;
   closeSuggestions();
 
+  // Open the tab synchronously (within the click handler) so browsers don't
+  // treat it as a blocked popup once we hit the await below.
+  const newTab = window.open('', '_blank');
+
   const record = await fetchFullRecord(selectedId);
-  if (!record) return;
-  window.top.location.href = buildSnapshotUrl(record);
-  // If you'd rather keep the host page in place and only navigate the iframe itself,
-  // use: window.location.href = buildSnapshotUrl(record);
+  if (!record) {
+    if (newTab) newTab.close();
+    return;
+  }
+  const url = buildSnapshotUrl(record);
+  if (newTab) {
+    newTab.location.href = url;
+  } else {
+    // Popup was blocked anyway; fall back to a direct open.
+    window.open(url, '_blank');
+  }
 }
 
 document.addEventListener('click', (e) => {
@@ -285,6 +296,31 @@ document.addEventListener('click', (e) => {
 
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------------------------------------------------------
+   IFRAME AUTO-RESIZE
+   Tells the host page how tall this widget currently is, so the
+   iframe can grow when the dropdown opens instead of clipping it.
+   Requires a small listener script on the host page — see the
+   embed snippet provided alongside this file.
+--------------------------------------------------------- */
+function reportHeight() {
+  const box = document.querySelector('.blue-box');
+  if (!box) return;
+  const height = Math.ceil(box.getBoundingClientRect().height);
+  window.parent.postMessage({ type: 'sby-search-resize', height: height }, '*');
+}
+
+// Report on load, and any time the dropdown opens/closes or content changes size.
+window.addEventListener('load', reportHeight);
+if (window.ResizeObserver) {
+  const ro = new ResizeObserver(reportHeight);
+  const box = document.querySelector('.blue-box');
+  if (box) ro.observe(box);
+} else {
+  // Fallback for older browsers: just re-check periodically.
+  setInterval(reportHeight, 400);
 }
 </script>
 </body>
