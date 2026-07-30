@@ -56,6 +56,21 @@
     display: flex;
     align-items: center;
   }
+  .clear-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: none;
+    color: #9a9a9a;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+  }
+  .clear-btn:hover { color: #2c2c2c; }
+  .clear-btn.show { display: flex; }
 
   .suggestions {
     position: absolute;
@@ -107,6 +122,9 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           </span>
           <input type="text" id="addr-input" placeholder="Search your address" autocomplete="off">
+          <button type="button" class="clear-btn" id="clear-btn" aria-label="Clear search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
         <div class="suggestions" id="suggestions"></div>
         <div class="footnote">Find your council district, polling place, zoning and more.</div>
@@ -226,6 +244,7 @@ function buildSnapshotUrl(record) {
 --------------------------------------------------------- */
 const input = document.getElementById('addr-input');
 const suggBox = document.getElementById('suggestions');
+const clearBtn = document.getElementById('clear-btn');
 
 let currentMatches = [];
 let activeIndex = -1;
@@ -234,6 +253,7 @@ let selectedId = null;
 
 input.addEventListener('input', () => {
   selectedId = null;
+  clearBtn.classList.toggle('show', input.value.length > 0);
   const q = input.value.trim();
   clearTimeout(debounceTimer);
   if (q.length < 2) { closeSuggestions(); return; }
@@ -241,6 +261,14 @@ input.addEventListener('input', () => {
     currentMatches = await fetchSuggestions(q);
     renderSuggestions(currentMatches);
   }, 180);
+});
+
+clearBtn.addEventListener('click', () => {
+  input.value = '';
+  selectedId = null;
+  clearBtn.classList.remove('show');
+  closeSuggestions();
+  input.focus();
 });
 
 input.addEventListener('keydown', (e) => {
@@ -293,6 +321,7 @@ function closeSuggestions() {
 
 async function selectAddress(match) {
   input.value = match.address;
+  clearBtn.classList.add('show');
   selectedId = match.id;
   closeSuggestions();
 
