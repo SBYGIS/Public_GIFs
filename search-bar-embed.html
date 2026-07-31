@@ -179,15 +179,50 @@ function deriveCityStatus(isInCity) {
 /* ---------------------------------------------------------
    DATA FETCHING
 --------------------------------------------------------- */
-// Lets someone type "w", "W", or "west" and match addresses stored
-// with any of those forms (same for n/north, s/south, e/east).
-const DIRECTION_MAP = { n: "north", north: "n", s: "south", south: "s", e: "east", east: "e", w: "west", west: "w" };
+// Lets someone type either form of common address abbreviations and match
+// addresses stored with the other form — directions (w/west), street types
+// (dr/drive), and common unit designators.
+const ADDRESS_ABBREVIATIONS = {
+  // Cardinal directions
+  n: "north", north: "n",
+  s: "south", south: "s",
+  e: "east", east: "e",
+  w: "west", west: "w",
+  ne: "northeast", northeast: "ne",
+  nw: "northwest", northwest: "nw",
+  se: "southeast", southeast: "se",
+  sw: "southwest", southwest: "sw",
+
+  // Street types
+  ave: "avenue", avenue: "ave",
+  blvd: "boulevard", boulevard: "blvd",
+  cir: "circle", circle: "cir",
+  ct: "court", court: "ct",
+  dr: "drive", drive: "dr",
+  hwy: "highway", highway: "hwy",
+  ln: "lane", lane: "ln",
+  pkwy: "parkway", parkway: "pkwy",
+  pl: "place", place: "pl",
+  plz: "plaza", plaza: "plz",
+  rd: "road", road: "rd",
+  sq: "square", square: "sq",
+  st: "street", street: "st",
+  ter: "terrace", terrace: "ter",
+  trl: "trail", trail: "trl",
+  aly: "alley", alley: "aly",
+
+  // Unit/secondary designators
+  apt: "apartment", apartment: "apt",
+  ste: "suite", suite: "ste",
+  bldg: "building", building: "bldg",
+  fl: "floor", floor: "fl"
+};
 
 function buildQueryVariants(q) {
   const words = q.trim().split(/\s+/);
   const variants = new Set([q.trim()]);
   words.forEach((word, idx) => {
-    const swap = DIRECTION_MAP[word.toLowerCase()];
+    const swap = ADDRESS_ABBREVIATIONS[word.toLowerCase()];
     if (swap) {
       const alt = words.slice();
       alt[idx] = swap;
